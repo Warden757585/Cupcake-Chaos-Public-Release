@@ -3,3 +3,5 @@ This is the Full and Official Public Release of Cupcake Chaos Made by Warden7575
 This Project is Licensed under the MIT License.
 The controls are simple and explained. Use WASD to move the character. 
 Credits to Peter Hull for the 'VT323' Font and LemonZu for the 'Kitchen and more' tilemap asset
+## Issues:
+If you have any issues please create a [GitHub issue](../../issues)
