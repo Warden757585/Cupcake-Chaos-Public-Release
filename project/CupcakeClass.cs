@@ -10,21 +10,25 @@ public class CupcakeClass
 	Vector2 position;
 	PlayerClass player;
 	SoundEffect collect;
-	int random_x, random_y;
+	int random_x, random_y, seed;
+    public int max_x, max_y, min_x, min_y;
+	public Random random;
 
 
-	public CupcakeClass(Texture2D Texture,PlayerClass Player, SoundEffect Collect)
+    public CupcakeClass(Texture2D Texture,PlayerClass Player, SoundEffect Collect, int Seed)
 	{
 		this.texture = Texture;
 		this.player = Player;
 		this.collect = Collect;
-    }
+		this.seed = Seed;
 
-    public int max_x, max_y, min_x, min_y;
-    public Random random = new Random();
+		random = new Random(seed);
+    }
 
     public void SetCupcakeContent(GraphicsDevice graphicsDevice)
 	{
+        random = new Random(seed);
+
         // Finding the min and max spawn values for a cupcake:
 
         max_x = graphicsDevice.Viewport.Width - texture.Width;

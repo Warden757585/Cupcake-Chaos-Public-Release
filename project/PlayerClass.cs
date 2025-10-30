@@ -7,28 +7,32 @@ using System.Reflection.Metadata;
 
 public class PlayerClass
 {
-	Texture2D texture;
-	public int x, y, score;
-	public float speed;
-
-	public PlayerClass(Texture2D Texture, int X, int Y, float Speed = 1.75f)
-	{
-		this.texture = Texture;
-        this.x = X;
-		this.y = Y;
-		this.speed = Speed;
-	}
-
-	//Player content load function
-
-	Vector2 position;
+    Texture2D texture;
+    public float x_velocity;
+    public float y_velocity;
+    public int x, y, score;
+    public float speed;
+    Vector2 position;
     public int max_x, max_y, min_x, min_y;
-    public Random random = new Random();
+    public Random random;
+    int seed;
+
+
+    public PlayerClass(Texture2D Texture,int Seed)
+    {
+        this.texture = Texture;
+        this.seed = Seed;
+
+        random = new Random(seed + 1);
+    }
+
+    //Player content load function
 
     public void SetPlayerContent(GraphicsDevice graphicsDevice)
-	{
+    {
+        random = new Random(seed + 1);
         score = 0;
-        speed = 1.75f;
+        speed = 1;
 
         // Finding the min and max spawn values for a player:
 
@@ -48,32 +52,53 @@ public class PlayerClass
 
     }
 
-	public void PlayerLogic_Input()
-	{
+    public void PlayerLogic_Input()
+    {
         KeyboardState state = Keyboard.GetState();
 
         if (state.IsKeyDown(Keys.W))
         {
-            position.Y -= 1 * speed;
+            y_velocity -= 1 * (speed / 1.5f);
         }
         if (state.IsKeyDown(Keys.S))
         {
-            position.Y += 1 * speed;
+            y_velocity += 1 * (speed / 1.5f);
         }
         if (state.IsKeyDown(Keys.A))
         {
-            position.X -= 1 * speed;
+            x_velocity -= 1 * (speed / 1.5f);
         }
         if (state.IsKeyDown(Keys.D))
         {
-            position.X += 1 * speed;
+            x_velocity += 1 * (speed / 1.5f);
+
         }
-        if(speed < 10)
+        if (state.IsKeyDown(Keys.Z))
         {
-            speed = 1.75f + (score * 0.05f);
-            speed = (float)Math.Round(speed, 2);
+
         }
-        
+
+        if (speed <= 3 && speed >= 1)
+        {
+            speed = 1 + (score * 0.025f);
+            speed = (float)Math.Round(speed, 3);
+        }
+
+        position.X += x_velocity;
+        position.Y += y_velocity;
+
+        //Damping Effect:
+
+        x_velocity *= 0.80f;
+        y_velocity *= 0.80f;
+        if (x_velocity < 0.5f && x_velocity > -0.5f)
+        {
+            x_velocity = 0;
+        }
+        if (y_velocity < 0.5f && y_velocity > -0.5f)
+        {
+            y_velocity = 0;
+        }
     }
     public void PlayerDrawing(SpriteBatch spriteBatch)
     {

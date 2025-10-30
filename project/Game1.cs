@@ -11,6 +11,8 @@ namespace CupcakeChaos
     {
         MENU,
         GAME,
+        TIMED,
+        GAMEOVER,
         CREDITS
     }
 
@@ -21,6 +23,7 @@ namespace CupcakeChaos
 
         CupcakeClass cupcake;
         PlayerClass P1;
+        TimerClass t;
         SpriteFont score_font;
         SpriteFont menu_font;
         Vector2 score_position;
@@ -31,7 +34,8 @@ namespace CupcakeChaos
         Song track1_song5;
         Song[] track1;
         SoundEffect cupcake_collect;
-        Random r = new Random();
+        int seed = 15;
+        Random r;
         Scenes active_scene;
         Vector2 menu_heading;
         Vector2 menu_subheading;
@@ -46,7 +50,7 @@ namespace CupcakeChaos
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            r = new Random(seed);
 
             base.Initialize();
         }
@@ -54,6 +58,7 @@ namespace CupcakeChaos
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            t = new TimerClass(30);
 
             //Load songs and audio effects
             //SFX:
@@ -70,11 +75,11 @@ namespace CupcakeChaos
             SongIndex = r.Next(1,track1.Length);
 
             //Load Player Content
-            P1 = new PlayerClass(Content.Load<Texture2D>("Sprites/Blue Square Guy"), GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            P1 = new PlayerClass(Content.Load<Texture2D>("Sprites/Blue Square Guy"), seed);
             P1.SetPlayerContent(GraphicsDevice);
 
             //Load Cupcake Content
-            cupcake = new CupcakeClass(Content.Load<Texture2D>("Sprites/Cupcake"), P1, cupcake_collect);
+            cupcake = new CupcakeClass(Content.Load<Texture2D>("Sprites/Cupcake"), P1, cupcake_collect, seed);
             cupcake.SetCupcakeContent(GraphicsDevice);
 
             //Load Score Text and Score Font
@@ -115,6 +120,14 @@ namespace CupcakeChaos
                         active_scene = Scenes.CREDITS;
                         menu_subheading.Y += 45;
                     }
+                    else if (Keyboard.GetState().IsKeyDown(Keys.T))
+                    {
+                        active_scene = Scenes.TIMED;
+                        P1.SetPlayerContent(GraphicsDevice);
+                        cupcake.SetCupcakeContent(GraphicsDevice);
+                        t.setTick(30);
+                        t.resetTimer();
+                    }
 
                     MediaPlayer.Stop();
 
@@ -145,6 +158,44 @@ namespace CupcakeChaos
                     }
                     break;
 
+                case Scenes.TIMED:
+                    if (Keyboard.GetState().IsKeyDown(Keys.RightShift))
+                    {
+                        active_scene = Scenes.MENU;
+                    }
+
+                    P1.PlayerLogic_Input();
+                    cupcake.CollisionLogic();
+                    t.Update(gameTime);
+                    if (t.isTicked())
+                    {
+                        active_scene = Scenes.GAMEOVER;
+                    }
+
+                    //Music Logic:
+
+                    if (MediaPlayer.State == MediaState.Stopped)
+                    {
+                        if (SongIndex < track1.Length - 1)
+                        {
+                            SongIndex++;
+                            MediaPlayer.Play(track1[SongIndex]);
+                        }
+                        else
+                        {
+                            SongIndex = 0;
+                        }
+                    }
+                    break;
+
+                case Scenes.GAMEOVER:
+                    if (Keyboard.GetState().IsKeyDown(Keys.RightShift))
+                    {
+                        active_scene = Scenes.MENU;
+                    }
+                    MediaPlayer.Stop();
+                    break;
+
                 case Scenes.CREDITS:
                     if (Keyboard.GetState().IsKeyDown(Keys.RightShift))
                     {
@@ -170,7 +221,7 @@ namespace CupcakeChaos
 
                     _spriteBatch.Begin();
                     _spriteBatch.DrawString(menu_font, "Cupcake Chaos", menu_heading, Color.LightPink);
-                    _spriteBatch.DrawString(menu_font, "   Press ENTER to Start\nPress R-SHIFT to open Menu\n  Press C to open Credits", menu_subheading, Color.LightPink);
+                    _spriteBatch.DrawString(menu_font, "   Press ENTER to Start\nPress R-SHIFT to open Menu\n  Press C to open Credits\n   Press T to play Timed", menu_subheading, Color.LightPink);
                     _spriteBatch.End();
 
                     break;
@@ -183,6 +234,23 @@ namespace CupcakeChaos
                     _spriteBatch.DrawString(menu_font, $"Score: {P1.score}\nSpeed: {P1.GetSpeed()}", score_position, Color.LightPink);
                     _spriteBatch.End();
 
+                    break;
+
+                case Scenes.TIMED:
+
+                    _spriteBatch.Begin();
+                    cupcake.CupcakeDrawing(_spriteBatch);
+                    P1.PlayerDrawing(_spriteBatch);
+                    _spriteBatch.DrawString(menu_font, $"Time Remaining: {Math.Round(t.tick - t.getTime(), 3)}\nSpeed: {P1.GetSpeed()}", score_position, Color.LightPink);
+                    _spriteBatch.End();
+
+                    break;
+
+                case Scenes.GAMEOVER:
+                    _spriteBatch.Begin();
+                    _spriteBatch.DrawString(menu_font, "GAME OVER", menu_heading, Color.LightPink);
+                    _spriteBatch.DrawString(menu_font, $"Press R-SHIFT to return to Menu\nScore:{P1.score}", menu_subheading, Color.LightPink);
+                    _spriteBatch.End();
                     break;
 
                 case Scenes.CREDITS:
