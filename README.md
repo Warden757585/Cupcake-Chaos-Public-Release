@@ -1,4 +1,4 @@
-#Cupcake Chaos - Public Release
+Cupcake Chaos - Public Release
 This is the Full and Official Public Release of Cupcake Chaos Made by Warden757585.
 This Project is Licensed under the MIT License.
 The controls are simple and explained. Use WASD to move the character. 
