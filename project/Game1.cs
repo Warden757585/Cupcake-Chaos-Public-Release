@@ -50,6 +50,7 @@ namespace CupcakeChaos
 
         protected override void Initialize()
         {
+            r = new Random();
             seed = r.Next();
             r = new Random(seed);
 
