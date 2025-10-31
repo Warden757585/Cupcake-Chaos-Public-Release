@@ -34,8 +34,8 @@ namespace CupcakeChaos
         Song track1_song5;
         Song[] track1;
         SoundEffect cupcake_collect;
-        int seed = 15;
         Random r;
+        int seed;
         Scenes active_scene;
         Vector2 menu_heading;
         Vector2 menu_subheading;
@@ -50,6 +50,7 @@ namespace CupcakeChaos
 
         protected override void Initialize()
         {
+            seed = r.Next();
             r = new Random(seed);
 
             base.Initialize();
@@ -82,8 +83,7 @@ namespace CupcakeChaos
             cupcake = new CupcakeClass(Content.Load<Texture2D>("Sprites/Cupcake"), P1, cupcake_collect, seed);
             cupcake.SetCupcakeContent(GraphicsDevice);
 
-            //Load Score Text and Score Font
-            score_font = Content.Load<SpriteFont>("Fonts/ScoreFont");
+            //Load Score Text
             score_position = new Vector2(10, 10);
             
             //Load Menu Content
@@ -93,7 +93,7 @@ namespace CupcakeChaos
             Vector2 CentreScreen = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
             menu_heading = CentreScreen - HeadStringSize / 2;
             menu_subheading = CentreScreen - SubStringSize / 2;
-            menu_subheading.Y += HeadStringSize.Y + 20;
+            menu_subheading.Y += HeadStringSize.Y + 30;
 
             menu_heading.Y -= 200;
             menu_subheading.Y -= 200;
